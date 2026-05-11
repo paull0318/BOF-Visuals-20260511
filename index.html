@@ -1,92 +1,26 @@
-
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Line chart showing BOF appropriations vs allotments from 1888 to 1909, with a large spending spike in 1896.</h2>
-<div style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:12px;font-size:12px;color:var(--color-text-secondary);">
-  <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:3px;background:#378ADD;display:inline-block;border-radius:2px;"></span>Appropriated by Congress</span>
-  <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:3px;background:#D85A30;display:inline-block;border-radius:2px;"></span>Actually allotted</span>
-  <span style="display:flex;align-items:center;gap:5px;"><span style="width:10px;height:3px;background:#1D9E75;display:inline-block;border-radius:2px;border-top:2px dashed #1D9E75;"></span>BOF estimate requested</span>
-</div>
-<div style="position:relative;width:100%;height:300px;">
-  <canvas id="arcChart" role="img" aria-label="Line chart: Congressional appropriations peaked at $595K in 1888, allotments spiked to $654K in 1896 drawing on reserve funds.">Appropriations ranged from $5K to $595K; allotments peaked at $654K in 1896.</canvas>
-</div>
-<p style="font-size:11px;color:var(--color-text-tertiary);text-align:center;margin-top:8px;">1896 allotments ($654K) exceeded appropriations ($250K) by drawing on accumulated prior-year reserves. Shaded area = surplus/deficit.</p>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
-const isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-const tc = isDark ? '#c9c8c3' : '#666';
-const gc = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
-
-const years = [1888,1889,1890,1891,1892,1893,1894,1895,1896,1897,1898,1899,1900,1901,1902,1903,1904,1905,1906,1907,1908,1909];
-const appropriated = [595000,231000,155000,150000,210000,125000,150000,100000,250000,150000,100000,100000,140000,100000,100000,140000,100000,10000,5000,25000,80000,100000];
-const allotted = [0,12750,0,12650,445717,0,0,2700,653607,220457,68291,27367,134598,83658,70728,156845,218303,40991,0,0,0,0];
-const requested = [null,null,null,null,null,null,385000,300000,245000,150000,100000,100000,100000,100000,null,null,null,null,null,null,null,null];
-
-new Chart(document.getElementById('arcChart'), {
-  type: 'line',
-  data: {
-    labels: years,
-    datasets: [
-      {
-        label: 'Appropriated',
-        data: appropriated,
-        borderColor: '#378ADD',
-        backgroundColor: 'rgba(55,138,221,0.08)',
-        borderWidth: 2,
-        pointRadius: 4,
-        pointBackgroundColor: '#378ADD',
-        pointBorderColor: isDark ? '#1a1a1a' : '#fff',
-        pointBorderWidth: 1.5,
-        fill: false,
-        tension: 0.3,
-        order: 1,
-      },
-      {
-        label: 'Allotted',
-        data: allotted,
-        borderColor: '#D85A30',
-        backgroundColor: 'rgba(216,90,48,0.08)',
-        borderWidth: 2,
-        pointRadius: 4,
-        pointBackgroundColor: '#D85A30',
-        pointBorderColor: isDark ? '#1a1a1a' : '#fff',
-        pointBorderWidth: 1.5,
-        fill: false,
-        tension: 0.3,
-        order: 2,
-      },
-      {
-        label: 'BOF estimate',
-        data: requested,
-        borderColor: '#1D9E75',
-        borderWidth: 2,
-        borderDash: [5,4],
-        pointRadius: 4,
-        pointStyle: 'triangle',
-        pointBackgroundColor: '#1D9E75',
-        fill: false,
-        tension: 0,
-        order: 3,
-        spanGaps: false,
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => ctx.raw != null ? ctx.dataset.label + ': $' + ctx.raw.toLocaleString() : null,
-          filter: item => item.raw != null && item.raw > 0,
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BOF Analysis Portal</title>
+    <style>
+        body { font-family: sans-serif; background: #0d0d0d; color: #fff; padding: 50px; }
+        h1 { color: #C89218; border-bottom: 2px solid #011F5B; padding-bottom: 10px; }
+        .menu { display: grid; gap: 20px; margin-top: 30px; }
+        .nav-link { 
+            background: #1a1a1a; padding: 20px; border-radius: 8px; 
+            text-decoration: none; color: #4db8ff; font-weight: bold;
+            border: 1px solid #333; transition: 0.3s;
         }
-      }
-    },
-    scales: {
-      x: { ticks: { color: tc, font:{size:11}, maxRotation:45, autoSkip:false, callback:(v,i)=>years[i]%4===0?years[i]:'' }, grid:{color:gc} },
-      y: { ticks: { color: tc, font:{size:11}, callback: v=>'$'+(v/1000).toFixed(0)+'K' }, grid:{color:gc} }
-    }
-  }
-});
-</script>
+        .nav-link:hover { background: #011F5B; color: #fff; border-color: #C89218; }
+    </style>
+</head>
+<body>
+    <h1>BOF Fiscal & Portfolio Analysis Portal</h1>
+    <div class="menu">
+        <a class="nav-link" href="bof_fiscal_arc_appropriated_vs_allotted.html">1. Fiscal Arc: Appropriated vs Allotted</a>
+        <a class="nav-link" href="bof_full_dataset_sunburst.html">2. Categorical Sunburst Analysis</a>
+        <a class="nav-link" href="bof_longitudinal_stacked_area_1888_1910.html">3. Longitudinal Budgeting Trends</a>
+        <a class="nav-link" href="bof_portfolio_donut_full_dataset.html">4. Portfolio Distribution & Performance</a>
+    </div>
+</body>
+</html>
