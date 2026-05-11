@@ -1,0 +1,57 @@
+
+<div style="padding:.5rem 0;">
+  <p style="text-align:center;font-size:13px;font-weight:600;color:var(--color-text-primary);margin:0 0 2px;letter-spacing:.03em;">BOF Longitudinal Budget vs. Spending (1888–1910)</p>
+  <p style="text-align:center;font-size:11px;color:var(--color-text-tertiary);margin:0 0 12px;">Congressional appropriations vs. active allotments by category · 1896 recapture spike shown separately</p>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px;font-size:11px;color:var(--color-text-secondary);">
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#c0392b;display:inline-block;"></span>Heavy Artillery</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#d4821a;display:inline-block;"></span>Explosives & Ammo</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#1a7abf;display:inline-block;"></span>Ops & Research</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#6c3d9e;display:inline-block;"></span>Fire Control</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#d4380d;display:inline-block;"></span>Small Arms</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#1D9E75;display:inline-block;"></span>Aviation</span>
+    <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:rgba(200,50,50,0.25);border:1px dashed #c0392b;display:inline-block;"></span>Appropriation</span>
+  </div>
+  <div style="position:relative;width:100%;height:320px;">
+    <canvas id="areaChart"></canvas>
+  </div>
+  <p style="text-align:center;font-size:11px;color:var(--color-text-tertiary);margin-top:8px;">⚠ 1896: $456K in revoked allotments recaptured — largest "administrative cleanup" in BOF history</p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const isDark = matchMedia('(prefers-color-scheme:dark)').matches;
+const tc = isDark?'#c9c8c3':'#555', gc = isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.06)';
+
+const years = [1888,1889,1891,1892,1895,1896,1897,1898,1899,1900,1901,1902,1903,1904,1905,1906,1907,1908,1909,1910];
+const approp = [595000,231000,150000,210000,100000,250000,150000,100000,100000,140000,100000,100000,140000,100000,10000,5000,25000,80000,100000,25000];
+const artillery= [0,0,0,372813,0,99901,53699,25860,0,59055,46201,29561,8500,43812,11265,0,0,0,0,0];
+const explosives=[0,0,7450,32750,0,40385,74689,16628,1000,24560,1525,16657,26041,77930,4495,0,0,0,0,0];
+const ops=       [0,0,5000,32584,0,13819,76377,19449,766,24317,20296,20854,91516,18951,13441,0,0,0,0,0];
+const fireCtrl=  [0,0,200,6568,0,3075,15681,3302,0,3099,0,2935,125,12206,175,0,0,0,0,0];
+const smallArms= [0,0,0,0,1500,40000,0,300,600,9478,15000,100,390,80,50,0,0,0,0,0];
+const aviation=  [0,0,0,0,0,0,0,0,25000,0,0,0,0,0,0,0,0,0,0,0];
+
+new Chart(document.getElementById('areaChart'),{
+  type:'bar',
+  data:{
+    labels:years,
+    datasets:[
+      {label:'Heavy Artillery',data:artillery,backgroundColor:'rgba(192,57,43,0.82)',stack:'spend',order:2},
+      {label:'Explosives & Ammo',data:explosives,backgroundColor:'rgba(212,130,26,0.82)',stack:'spend',order:2},
+      {label:'Ops & Research',data:ops,backgroundColor:'rgba(26,122,191,0.82)',stack:'spend',order:2},
+      {label:'Fire Control',data:fireCtrl,backgroundColor:'rgba(108,61,158,0.82)',stack:'spend',order:2},
+      {label:'Small Arms',data:smallArms,backgroundColor:'rgba(212,56,13,0.82)',stack:'spend',order:2},
+      {label:'Aviation',data:aviation,backgroundColor:'rgba(29,158,117,0.9)',stack:'spend',order:2},
+      {type:'line',label:'Appropriation',data:approp,borderColor:'rgba(220,80,80,0.9)',backgroundColor:'rgba(220,80,80,0.08)',borderWidth:2,borderDash:[5,3],pointRadius:3,pointBackgroundColor:'rgba(220,80,80,0.9)',fill:false,order:1,stack:undefined},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': $'+ctx.raw.toLocaleString()}}},
+    scales:{
+      x:{stacked:true,ticks:{color:tc,font:{size:11},maxRotation:45},grid:{color:gc}},
+      y:{stacked:true,ticks:{color:tc,font:{size:11},callback:v=>'$'+(v/1000).toFixed(0)+'K'},grid:{color:gc}}
+    }
+  }
+});
+</script>
